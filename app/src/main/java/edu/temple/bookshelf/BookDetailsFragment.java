@@ -1,57 +1,146 @@
 package edu.temple.bookshelf;
 
+import android.content.Context;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
 
 
 public class BookDetailsFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String BOOKCASE_KEY = "book case";
-    private Book book;
-    private TextView titleTextView;
 
-    public BookDetailsFragment() {
-        // Required empty public constructor
+    private TextView bookTitle, bookYear, bookAuthor;
+    private ImageView bookImage;
+    private ImageButton playButton, pauseButton, stopButton;
+    public SeekBar audioProgress;
+    private BookDetailsListener listener;
+    public Button downloadButton;
+
+    public interface BookDetailsListener {
+        void bookPlay();
+
+        void bookPause();
+
+        void bookStop();
+
+        void setBookPosition(int bookPosition);
+
+        void bookDownload();
     }
 
-    public static BookDetailsFragment newInstance(Book book) {
-        BookDetailsFragment fragment = new BookDetailsFragment();
-        Bundle args = new Bundle();
-        args.putString(BOOKCASE_KEY, book.getTitle());
-        fragment.setArguments(args);
-        return fragment;
+    @Nullable
+    @Override
+    public View onCreateView(
+            @NonNull LayoutInflater inflater,
+            @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_book_detail, container, false);
+
+        bookTitle = view.findViewById(R.id.book_title);
+        bookYear = view.findViewById(R.id.book_year);
+        bookAuthor = view.findViewById(R.id.book_author);
+        bookImage = view.findViewById(R.id.book_image);
+        playButton = view.findViewById(R.id.play_button);
+        pauseButton = view.findViewById(R.id.pause_button);
+        stopButton = view.findViewById(R.id.stop_button);
+        audioProgress = view.findViewById(R.id.audio_progress);
+        downloadButton = view.findViewById(R.id.download_button);
+
+        playButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.bookPlay();
+            }
+        });
+
+        downloadButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.bookDownload();
+            }
+        });
+
+        stopButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.bookStop();
+            }
+        });
+
+        pauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.bookPause();
+            }
+        });
+
+        audioProgress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                listener.setBookPosition(seekBar.getProgress());
+            }
+        });
+
+        return view;
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            book = new Book(getArguments().getString(BOOKCASE_KEY));
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof BookDetailsListener) {
+            listener = (BookDetailsListener) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must implement Fragment Listener");
         }
-
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_book_details, container, false);
-        titleTextView = v.findViewById(R.id.bookTitleTextView);
-        titleTextView.setText(book.getTitle());
-        return v;
+    public void onDetach() {
+        super.onDetach();
+        listener = null;
     }
 
-
-
-    public void setTextView(Book book) {
-        titleTextView.setText(book.getTitle());
+    public void displayBook(Book book) {
+        bookTitle.setText(book.getTitle());
+        bookYear.setText(String.valueOf(book.getYearPublished()));
+        bookAuthor.setText(String.valueOf(book.getAuthor()));
+        setImage(book);
     }
-}
+
+    private void setImage(Book book) {
+        String url = book.getCoverURL();
+
+        Picasso
+                .with(this.getContext())
+                .load(url)
+                .into(bookImage);
+    }
+
+    public void swapDownloadToDelete() {
+        downloadButton.setText("Delete");
+    }
+
+    public void swapDeleteToDownload() {
+        downloadButton.setText("Download");
+    }
+}}

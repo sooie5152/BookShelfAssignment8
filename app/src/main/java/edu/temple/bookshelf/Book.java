@@ -1,13 +1,72 @@
 package edu.temple.bookshelf;
 
-public class Book {
-    private String title;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-    public Book(String title) {
-        this.title = title;
+public class Book {
+
+    private int id;
+    private String title;
+    private String author;
+    private int yearPublished;
+    private String coverURL;
+    private int duration;
+
+    public Book(JSONObject jsonBook) throws JSONException {
+        this.id = jsonBook.getInt("book_id");
+        this.title = jsonBook.getString("title");
+        this.author = jsonBook.getString("author");
+        this.yearPublished = jsonBook.getInt("published");
+        this.coverURL = jsonBook.getString("cover_url");
+        this.duration = jsonBook.getInt("duration");
+    }
+
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getTitle() {
-        return this.title;
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public int getYearPublished() {
+        return yearPublished;
+    }
+
+    public void setYearPublished(int yearPublished) {
+        this.yearPublished = yearPublished;
+    }
+
+    public String getCoverURL() {
+        return coverURL;
+    }
+
+    public void setCoverURL(String coverURL) {
+        this.coverURL = coverURL;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
     }
 }

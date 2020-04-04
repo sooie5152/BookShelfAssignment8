@@ -2,49 +2,52 @@ package edu.temple.bookshelf;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class BookAdapter extends BaseAdapter {
+import com.example.bookcase.R;
 
-    Context context;
-    String[] bookCase;
+import java.util.ArrayList;
 
-    public BookAdapter(Context context, String[] bookCase) {
-        this.context = context;
-        this.bookCase = bookCase;
+public class BookAdapter extends ArrayAdapter {
+
+    public BookAdapter(Context context, ArrayList<String> bookList) {
+        super(context, 0, bookList);
+    }
+
+    @NonNull
+    @Override
+    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+        return initView(position, convertView, parent);
     }
 
     @Override
-    public int getCount() {
-        return this.bookCase.length;
+    public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+        return initView(position, convertView, parent);
     }
 
-    @Override
-    public Object getItem(int position) {
-        Book book = new Book(bookCase[position]);
-        return book;
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return 0;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        TextView textView;
-        if (convertView instanceof TextView) {
-            textView = (TextView) convertView;
-        } else {
-            textView = new TextView(context);
+    private View initView(int position, View convertView, ViewGroup parent) {
+        if (convertView == null) {
+            convertView = LayoutInflater.from(getContext()).inflate(
+                    R.layout.book_spinner_row, parent, false
+            );
         }
-        textView.setText(bookCase[position]);
-        textView.setTextSize(40);
-        textView.setTextColor(Color.GRAY);
-        return textView;
-    }
 
+        convertView.setBackgroundColor(Color.WHITE);
+        TextView textViewName = convertView.findViewById(R.id.text_view_name);
+
+        String currentItem = (String) getItem(position);
+
+        if (currentItem != null) {
+            textViewName.setText(currentItem);
+        }
+
+        return convertView;
+
+    }
 }
